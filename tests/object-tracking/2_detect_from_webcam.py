@@ -87,3 +87,19 @@ if __name__ == '__main__':
     run_inference(detection_model, category_index, cap)
 
 # python ./detect_from_webcam.py -m ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model -l ./data/mscoco_label_map.pbtxt
+
+
+    # Model Path
+    detection_model = load_model("../../data/models/ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model")
+
+    # Path to Labelmap
+    category_index = label_map_util.create_category_index_from_labelmap("../../data/label_maps/mscoco_label_map.pbtxt", use_display_name=True)
+
+    # Path to image (or folder)
+    run_inference(detection_model, category_index, "../../data/images/test_images")
+
+    """
+    Detect objects inside from webcam stream
+    Command to start script :-
+    python 1_detect_from_images.py
+    """

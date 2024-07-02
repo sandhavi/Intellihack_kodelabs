@@ -1,5 +1,4 @@
 import numpy as np
-import argparse
 import os
 import tensorflow as tf
 from PIL import Image
@@ -122,16 +121,17 @@ def run_inference(model, category_index, image_path):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Detect objects inside webcam videostream')
-    parser.add_argument('-m', '--model', type=str, required=True, help='Model Path')
-    parser.add_argument('-l', '--labelmap', type=str, required=True, help='Path to Labelmap')
-    parser.add_argument('-i', '--image_path', type=str, required=True, help='Path to image (or folder)')
-    args = parser.parse_args()
+    # Model Path
+    detection_model = load_model("../../data/models/ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model")
 
-    detection_model = load_model(args.model)
-    category_index = label_map_util.create_category_index_from_labelmap(args.labelmap, use_display_name=True)
+    # Path to Labelmap
+    category_index = label_map_util.create_category_index_from_labelmap("../../data/label_maps/mscoco_label_map.pbtxt", use_display_name=True)
 
-    run_inference(detection_model, category_index, args.image_path)
+    # Path to image (or folder)
+    run_inference(detection_model, category_index, "../../data/images/test_images")
 
-# Command to start script
-#  python .\detect_from_images.py -m ssd_mobilenet_v2_320x320_coco17_tpu-8\saved_model -l .\data\mscoco_label_map.pbtxt -i .\test_images
+    """
+    Detect objects inside from set of images
+    Command to start script :-
+    python 1_detect_from_images.py
+    """
