@@ -1,5 +1,4 @@
 import numpy as np
-import argparse
 import tensorflow as tf
 import cv2
 from deep_sort_realtime.deepsort_tracker import DeepSort
