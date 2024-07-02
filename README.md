@@ -11,3 +11,6 @@ Highly advised to set up a separate `anaconda` environment to run, develop or te
 2. Open using the anaconda environment you created and install all the required files listed in `/requirements.txt` (use only the one in project root).
 3. Run the `main.py`
 
+## Development
+
+Highly recommended to use pycharm and anaconda.
