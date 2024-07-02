@@ -126,7 +126,7 @@ if __name__ == '__main__':
     run_inference(detection_model, category_index, cap, tracker, valid_classes)
 
     """
-    Detect objects inside webcam videostream
+    Add + mark at the center of bounding boxes of identified objects from webcam videostream
     Command to start script :-
     python 3_add_plus_to_track_from_webcam.py
     """
