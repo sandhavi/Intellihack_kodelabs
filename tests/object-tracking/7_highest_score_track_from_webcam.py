@@ -105,19 +105,23 @@ def run_inference(model, category_index, cap, tracker, valid_classes):
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Detect objects inside webcam videostream')
-    parser.add_argument('-m', '--model', type=str, required=True, help='Model Path')
-    parser.add_argument('-l', '--labelmap', type=str, required=True, help='Path to Labelmap')
-    parser.add_argument('--valid-classes', type=int, nargs='+', default=[1], help='Valid class IDs to track (default: 1 for people)')
-    args = parser.parse_args()
+    # Model Path
+    detection_model = load_model("../../data/models/ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model")
 
-    detection_model = load_model(args.model)
-    category_index = label_map_util.create_category_index_from_labelmap(args.labelmap, use_display_name=True)
+    # Path to Labelmap
+    category_index = label_map_util.create_category_index_from_labelmap("../../data/label_maps/mscoco_label_map.pbtxt", use_display_name=True)
 
+    # Track only these objects (label ids)
+    valid_classes = [1]
+
+    # Initialize DeepSORT tracker
     tracker = DeepSort(max_age=30, n_init=3, nms_max_overlap=1.0, embedder='mobilenet', half=True, bgr=True)
 
     cap = cv2.VideoCapture(0)
-    run_inference(detection_model, category_index, cap, tracker, args.valid_classes)
+    run_inference(detection_model, category_index, cap, tracker, valid_classes)
 
-# python 5_highest_score_track_from_webcam.py -m ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model -l data/mscoco_label_map.pbtxt --valid-classes 1
-# python 5_highest_score_track_from_webcam.py -m ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model -l data/mscoco_label_map.pbtxt --valid-classes 1 <drone_class_id>
+    """
+    Track object with highest score of identification using webcam
+    Command to start script :-
+    python 7_highest_score_track_from_webcam.py
+    """

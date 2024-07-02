@@ -136,7 +136,7 @@ if __name__ == '__main__':
     run_inference(detection_model, category_index, cap, tracker, valid_classes)
 
     """
-    Track the first seen object from webcam
+    Track the first seen object using webcam
     Command to start script :-
     python 6_first_seen_track_from_webcam.py
     """
