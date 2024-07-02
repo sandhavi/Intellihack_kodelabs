@@ -1,5 +1,4 @@
 import numpy as np
-import argparse
 import tensorflow as tf
 import cv2
 
@@ -75,31 +74,17 @@ def run_inference(model, category_index, cap):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Detect objects inside webcam videostream')
-    parser.add_argument('-m', '--model', type=str, required=True, help='Model Path')
-    parser.add_argument('-l', '--labelmap', type=str, required=True, help='Path to Labelmap')
-    args = parser.parse_args()
-
-    detection_model = load_model(args.model)
-    category_index = label_map_util.create_category_index_from_labelmap(args.labelmap, use_display_name=True)
-
-    cap = cv2.VideoCapture(0)
-    run_inference(detection_model, category_index, cap)
-
-# python ./detect_from_webcam.py -m ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model -l ./data/mscoco_label_map.pbtxt
-
-
     # Model Path
     detection_model = load_model("../../data/models/ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model")
 
     # Path to Labelmap
     category_index = label_map_util.create_category_index_from_labelmap("../../data/label_maps/mscoco_label_map.pbtxt", use_display_name=True)
 
-    # Path to image (or folder)
-    run_inference(detection_model, category_index, "../../data/images/test_images")
+    cap = cv2.VideoCapture(0)
+    run_inference(detection_model, category_index, cap)
 
     """
-    Detect objects inside from webcam stream
+    Detect objects inside webcam videostream
     Command to start script :-
-    python 1_detect_from_images.py
+    python 2_detect_from_webcam.py
     """
