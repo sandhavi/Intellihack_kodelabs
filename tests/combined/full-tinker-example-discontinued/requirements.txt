@@ -1,7 +1,0 @@
-numpy==1.24.4
-opencv-python==4.10.0.84
-pillow==10.3.0
-pygrabber~=0.2
-pywin32~=306
-tensorflow~=2.10.1
-pyyaml~=5.4.1
