@@ -15,11 +15,11 @@ Highly advised to set up a separate `anaconda` environment to run, develop or te
 
 Highly recommended to use pycharm and anaconda.
 
-## Convert pyqt5-ui to python file
+### Convert pyqt5-ui to python file
 
 Run the below command
 
-``bash
+```bash
 pyuic5 -o pyqt5_ui/main_window.py pyqt5_ui/main_window.ui
 pyuic5 -o pyqt5_ui/video_widget.py pyqt5_ui/video_widget.ui
 pyuic5 -o pyqt5_ui/chat_widget.py pyqt5_ui/chat_widget.ui
