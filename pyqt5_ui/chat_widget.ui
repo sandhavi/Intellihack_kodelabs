@@ -118,7 +118,7 @@
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>data/images/icons/send.svg</normaloff>data/images/icons/send.svg</iconset>
+         <normaloff>../data/images/icons/send.svg</normaloff>../data/images/icons/send.svg</iconset>
        </property>
       </widget>
      </item>

@@ -71,7 +71,7 @@
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>data/images/icons/power.svg</normaloff>data/images/icons/power.svg</iconset>
+           <normaloff>../data/images/icons/power.svg</normaloff>../data/images/icons/power.svg</iconset>
          </property>
         </widget>
        </item>
@@ -97,7 +97,7 @@
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>data/images/icons/signal.svg</normaloff>data/images/icons/signal.svg</iconset>
+           <normaloff>../data/images/icons/signal.svg</normaloff>../data/images/icons/signal.svg</iconset>
          </property>
         </widget>
        </item>

@@ -4,7 +4,9 @@ import cv2
 import time
 from model import load_model, run_inference_for_single_image, prepare_detections, initialize_tracker
 from object_detection.utils import label_map_util
-from pyqt5_ui.ui import Ui_MainWindow
+from pyqt5_ui.main_window import Ui_MainWindow
+from pyqt5_ui.video_widget import Ui_VideoWidget
+from pyqt5_ui.chat_widget import Ui_ChatWidget
 
 
 class DetectionThread(QtCore.QThread):
@@ -46,6 +48,18 @@ class DetectionThread(QtCore.QThread):
         self.cap.release()
 
 
+class VideoWidget(QtWidgets.QWidget, Ui_VideoWidget):
+    def __init__(self):
+        super(VideoWidget, self).__init__()
+        self.setupUi(self)
+
+
+class ChatWidget(QtWidgets.QWidget, Ui_ChatWidget):
+    def __init__(self):
+        super(ChatWidget, self).__init__()
+        self.setupUi(self)
+
+
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -54,14 +68,34 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.start_detection_thread()
         self.connect_buttons()
 
+        # Initialize the widgets
+        self.videoWidget = VideoWidget()
+        self.chatWidget = ChatWidget()
+
+        # Create the menu slots
+        self.actionVideo_Panel.triggered.connect(self.open_video_widget)
+        self.actionChat.triggered.connect(self.open_chat_widget)
+
+    def open_video_widget(self):
+        if self.videoWidget.isVisible():
+            self.videoWidget.show()
+        else:
+            self.videoWidget.show()
+
+    def open_chat_widget(self):
+        if self.chatWidget.isVisible():
+            self.chatWidget.show()
+        else:
+            self.chatWidget.show()
+
     def setup_camera_view(self):
         self.aspectRatio = 4 / 3
         self.scene = QtWidgets.QGraphicsScene(self)
-        self.cameraView.setScene(self.scene)
-        self.cameraView.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.cameraView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.cameraView.setStyleSheet("background: black; border: none")
-        self.cameraView.setFrameStyle(QtWidgets.QFrame.NoFrame)
+        self.videoWidget.cameraView.setScene(self.scene)
+        self.videoWidget.cameraView.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.videoWidget.cameraView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.videoWidget.cameraView.setStyleSheet("background: black; border: none")
+        self.videoWidget.cameraView.setFrameStyle(QtWidgets.QFrame.NoFrame)
         self.scene.setBackgroundBrush(QtGui.QBrush(QtCore.Qt.transparent))
 
     def start_detection_thread(self):
@@ -78,20 +112,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def stop_detection(self):
         self.detection_thread.stop()
 
-    def record_video(self):
-        # Implement video recording functionality
-        pass
-
-    def pause_video(self):
-        # Implement video pause functionality
-        pass
-
     def update_frame(self, q_image):
         pixmap = QtGui.QPixmap.fromImage(q_image)
         self.aspectRatio = pixmap.width() / pixmap.height()
         self.scene.clear()
         self.image_item = self.scene.addPixmap(pixmap)
-        self.cameraView.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
+        self.videoWidget.cameraView.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
         self.update_image_position()
 
     def resizeEvent(self, event):
@@ -100,7 +126,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def update_image_position(self):
         if hasattr(self, 'image_item') and self.image_item:
-            view_size = self.cameraView.size()
+            view_size = self.videoWidget.cameraView.size()
             if view_size.width() / view_size.height() > self.aspectRatio:
                 new_height = view_size.height()
                 new_width = int(new_height * self.aspectRatio)
@@ -112,13 +138,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.image_item.setPixmap(scaled_pixmap)
             self.image_item.setOffset(-new_width / 2, -new_height / 2)
             self.image_item.setPos(view_size.width() / 2, view_size.height() / 2)
-            self.cameraView.setSceneRect(0, 0, view_size.width(), view_size.height())
+            self.videoWidget.cameraView.setSceneRect(0, 0, view_size.width(), view_size.height())
+
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main()
