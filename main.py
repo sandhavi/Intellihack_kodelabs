@@ -64,13 +64,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
-        self.setup_camera_view()
-        self.start_detection_thread()
-        self.connect_buttons()
 
         # Initialize the widgets
         self.videoWidget = VideoWidget()
         self.chatWidget = ChatWidget()
+
+        # Startup actions
+        self.setup_camera_view()
+        self.start_detection_thread()
+        self.connect_buttons()
 
         # Create the menu slots
         self.actionVideo_Panel.triggered.connect(self.open_video_widget)
@@ -91,11 +93,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def setup_camera_view(self):
         self.aspectRatio = 4 / 3
         self.scene = QtWidgets.QGraphicsScene(self)
-        self.videoWidget.cameraView.setScene(self.scene)
-        self.videoWidget.cameraView.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.videoWidget.cameraView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.videoWidget.cameraView.setStyleSheet("background: black; border: none")
-        self.videoWidget.cameraView.setFrameStyle(QtWidgets.QFrame.NoFrame)
+        self.videoWidget.cameraGraphicsView.setScene(self.scene)
+        self.videoWidget.cameraGraphicsView.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.videoWidget.cameraGraphicsView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.videoWidget.cameraGraphicsView.setStyleSheet("background: black; border: none")
+        self.videoWidget.cameraGraphicsView.setFrameStyle(QtWidgets.QFrame.NoFrame)
         self.scene.setBackgroundBrush(QtGui.QBrush(QtCore.Qt.transparent))
 
     def start_detection_thread(self):
@@ -105,9 +107,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         QtCore.QCoreApplication.instance().aboutToQuit.connect(self.detection_thread.stop)
 
     def connect_buttons(self):
-        self.stopButton.clicked.connect(self.stop_detection)
-        self.recordButton.clicked.connect(self.record_video)
-        self.pauseButton.clicked.connect(self.pause_video)
+        # self.stopButton.clicked.connect(self.stop_detection)
+        # self.pauseButton.clicked.connect(self.pause_video)
+        pass
 
     def stop_detection(self):
         self.detection_thread.stop()
@@ -117,7 +119,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.aspectRatio = pixmap.width() / pixmap.height()
         self.scene.clear()
         self.image_item = self.scene.addPixmap(pixmap)
-        self.videoWidget.cameraView.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
+        self.videoWidget.cameraGraphicsView.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
         self.update_image_position()
 
     def resizeEvent(self, event):
@@ -126,7 +128,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def update_image_position(self):
         if hasattr(self, 'image_item') and self.image_item:
-            view_size = self.videoWidget.cameraView.size()
+            view_size = self.videoWidget.cameraGraphicsView.size()
             if view_size.width() / view_size.height() > self.aspectRatio:
                 new_height = view_size.height()
                 new_width = int(new_height * self.aspectRatio)
@@ -138,7 +140,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.image_item.setPixmap(scaled_pixmap)
             self.image_item.setOffset(-new_width / 2, -new_height / 2)
             self.image_item.setPos(view_size.width() / 2, view_size.height() / 2)
-            self.videoWidget.cameraView.setSceneRect(0, 0, view_size.width(), view_size.height())
+            self.videoWidget.cameraGraphicsView.setSceneRect(0, 0, view_size.width(), view_size.height())
 
 
 def main():
