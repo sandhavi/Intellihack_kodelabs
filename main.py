@@ -4,7 +4,7 @@ import cv2
 import time
 from model import load_model, run_inference_for_single_image, prepare_detections, initialize_tracker
 from object_detection.utils import label_map_util
-from ui import Ui_MainWindow
+from pyqt5_ui.ui import Ui_MainWindow
 
 
 class DetectionThread(QtCore.QThread):
@@ -33,7 +33,7 @@ class DetectionThread(QtCore.QThread):
                 track_id = track.track_id
                 ltrb = track.to_ltrb()
                 cv2.rectangle(frame, (int(ltrb[0]), int(ltrb[1])), (int(ltrb[2]), int(ltrb[3])), (0, 255, 0), 2)
-                cv2.putText(frame, f'ID: {track_id}', (int(ltrb[0]), int(ltrb[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                cv2.putText(frame, f'ID: {track_id}', (int(ltrb[0]), int(ltrb[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             height, width, channel = frame.shape
             bytes_per_line = 3 * width
