@@ -14,3 +14,11 @@ Highly advised to set up a separate `anaconda` environment to run, develop or te
 ## Development
 
 Highly recommended to use pycharm and anaconda.
+
+## Convert pyqt5-ui to python file
+
+Run the below command
+
+``bash
+pyuic5 -o ui.py pyqt5.ui
+```
