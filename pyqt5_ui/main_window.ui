@@ -25,6 +25,10 @@
   <property name="windowTitle">
    <string>ASAM System</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../data/images/icons/favicon.png</normaloff>../data/images/icons/favicon.png</iconset>
+  </property>
   <property name="toolTip">
    <string/>
   </property>
@@ -115,7 +119,7 @@
           <string>Select Camera</string>
          </property>
          <property name="currentText">
-          <string>Select Camera</string>
+          <string/>
          </property>
          <property name="iconSize">
           <size>

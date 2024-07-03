@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>343</width>
-    <height>254</height>
+    <width>476</width>
+    <height>355</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>ASAM System - Video Panel</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../data/images/icons/favicon.png</normaloff>../data/images/icons/favicon.png</iconset>
   </property>
   <property name="toolTip">
    <string/>

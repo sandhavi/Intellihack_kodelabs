@@ -14,7 +14,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_VideoWidget(object):
     def setupUi(self, VideoWidget):
         VideoWidget.setObjectName("VideoWidget")
-        VideoWidget.resize(343, 254)
+        VideoWidget.resize(476, 355)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("pyqt5_ui\\../data/images/icons/favicon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        VideoWidget.setWindowIcon(icon)
         VideoWidget.setToolTip("")
         self.verticalLayout = QtWidgets.QVBoxLayout(VideoWidget)
         self.verticalLayout.setObjectName("verticalLayout")
