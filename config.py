@@ -12,3 +12,6 @@ InputStreamAspectRatio = 4 / 3
 
 # Detect object(ids) included in this array
 ValidClasses = [1]
+
+# App help page
+HelpURL = "https://github.com/sandhavi/Intellihack_kodelabs/blob/main/README.md"

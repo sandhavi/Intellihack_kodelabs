@@ -3,6 +3,8 @@ import sys
 import cv2
 import time
 from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtCore import QUrl
 from model import load_model, run_inference_for_single_image, prepare_detections, initialize_tracker
 from object_detection.utils import label_map_util
 from pyqt5_ui.main_window import Ui_MainWindow
@@ -117,6 +119,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # Create the menu slots
         self.actionVideo_Panel.triggered.connect(self.open_video_widget)
         self.actionChat.triggered.connect(self.open_chat_widget)
+        self.actionHelp.triggered.connect(self.open_github_readme)
 
         # Main window button slots
         self.powerToggleButton.clicked.connect(self.toggle_detection_thread)
@@ -134,6 +137,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if not self.chatWidget.isVisible():
             self.chatWidget.show()
             self.chatWidget.raise_()
+
+    @staticmethod
+    def open_github_readme():
+        url = QUrl(config.HelpURL)
+        QDesktopServices.openUrl(url)
 
     def setup_camera_view(self):
         self.aspectRatio = config.InputStreamAspectRatio
