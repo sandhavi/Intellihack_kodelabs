@@ -32,3 +32,8 @@ pyuic5 -o pyqt5_ui/main_window.py pyqt5_ui/main_window.ui
 pyuic5 -o pyqt5_ui/video_widget.py pyqt5_ui/video_widget.ui
 pyuic5 -o pyqt5_ui/chat_widget.py pyqt5_ui/chat_widget.ui
 ```
+
+## Update app settings
+
+Update variable values in the `config.py`.
+

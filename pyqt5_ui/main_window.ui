@@ -185,7 +185,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QCheckBox" name="allCheckBox">
+          <widget class="QRadioButton" name="allObjectRadioButton">
            <property name="text">
             <string>All</string>
            </property>
@@ -195,17 +195,14 @@
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="peopleCheckBox">
+          <widget class="QRadioButton" name="peopleObjectRadioButton">
            <property name="text">
             <string>People</string>
-           </property>
-           <property name="tristate">
-            <bool>false</bool>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="dronesCheckBox">
+          <widget class="QRadioButton" name="dronesObjectRadioButton">
            <property name="text">
             <string>Drones</string>
            </property>
@@ -221,7 +218,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
-          <widget class="QRadioButton" name="meanTarget">
+          <widget class="QRadioButton" name="meanTargetRadioButton">
            <property name="text">
             <string>Mean</string>
            </property>
@@ -231,14 +228,14 @@
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="firstTarget">
+          <widget class="QRadioButton" name="firstTargetRadioButton">
            <property name="text">
             <string>First</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="mostRecognizableTarget">
+          <widget class="QRadioButton" name="mostRecognizableTargetRadioButton">
            <property name="text">
             <string>Most Recognizable</string>
            </property>

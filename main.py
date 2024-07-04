@@ -9,6 +9,7 @@ from pyqt5_ui.main_window import Ui_MainWindow
 from pyqt5_ui.video_widget import Ui_VideoWidget
 from pyqt5_ui.chat_widget import Ui_ChatWidget
 from utills import resource_path
+import config
 
 
 class DetectionThread(QtCore.QThread):
@@ -21,12 +22,11 @@ class DetectionThread(QtCore.QThread):
         self.mutex = QtCore.QMutex()
         self.pause_condition = QtCore.QWaitCondition()
         self.cap = cv2.VideoCapture(0)
-        model_path = resource_path("data/models/ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model")
+        model_path = resource_path(config.DetectionModel)
         self.detection_model = load_model(model_path)
-        self.category_index = label_map_util.create_category_index_from_labelmap(
-            resource_path("data/label_maps/mscoco_label_map.pbtxt"), use_display_name=True)
-        self.valid_classes = [1]
-        self.tracker = initialize_tracker(embedder="mobilenet")
+        self.category_index = label_map_util.create_category_index_from_labelmap(resource_path(config.LabelMap), use_display_name=True)
+        self.valid_classes = config.ValidClasses
+        self.tracker = initialize_tracker(embedder=config.DeepsortTracker)
 
     def run(self):
         while self._running:
@@ -136,7 +136,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.chatWidget.raise_()
 
     def setup_camera_view(self):
-        self.aspectRatio = 4 / 3
+        self.aspectRatio = config.InputStreamAspectRatio
         self.scene = QtWidgets.QGraphicsScene(self)
         self.videoWidget.cameraGraphicsView.setScene(self.scene)
         self.videoWidget.cameraGraphicsView.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
