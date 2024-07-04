@@ -1,4 +1,4 @@
-# ASAM System
+# <img src="data/images/icons/github_logo.png" height="24px"> ASAM System
 ___*AI Security CaMera System*_ - _*KodeLabs product.*___
 
 Civilian and Military surveillance and protection system.

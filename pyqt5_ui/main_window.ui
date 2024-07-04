@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>343</width>
+    <width>380</width>
     <height>242</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>240</width>
+    <width>380</width>
     <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>420</width>
+    <width>440</width>
     <height>242</height>
    </size>
   </property>
@@ -147,6 +147,32 @@
          </item>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="refreshCameraListButton">
+         <property name="minimumSize">
+          <size>
+           <width>31</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>31</width>
+           <height>31</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Toggle Serial Signal</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../data/images/icons/refresh.svg</normaloff>../data/images/icons/refresh.svg</iconset>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -182,6 +208,39 @@
           <widget class="QCheckBox" name="dronesCheckBox">
            <property name="text">
             <string>Drones</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_4">
+        <property name="title">
+         <string>Target Type</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QRadioButton" name="meanTarget">
+           <property name="text">
+            <string>Mean</string>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="firstTarget">
+           <property name="text">
+            <string>First</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="mostRecognizableTarget">
+           <property name="text">
+            <string>Most Recognizable</string>
            </property>
           </widget>
          </item>
@@ -300,7 +359,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>343</width>
+     <width>380</width>
      <height>21</height>
     </rect>
    </property>
@@ -308,7 +367,6 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpen"/>
     <addaction name="actionNew"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
