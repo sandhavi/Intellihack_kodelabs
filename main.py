@@ -120,6 +120,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionVideo_Panel.triggered.connect(self.open_video_widget)
         self.actionChat.triggered.connect(self.open_chat_widget)
         self.actionHelp.triggered.connect(self.open_github_readme)
+        self.actionExit.triggered.connect(self.exit_app)
 
         # Main window button slots
         self.powerToggleButton.clicked.connect(self.toggle_detection_thread)
@@ -142,6 +143,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def open_github_readme():
         url = QUrl(config.HelpURL)
         QDesktopServices.openUrl(url)
+
+    @staticmethod
+    def exit_app():
+        QtWidgets.QApplication.quit()
 
     def setup_camera_view(self):
         self.aspectRatio = config.InputStreamAspectRatio

@@ -366,7 +366,7 @@
     </property>
     <addaction name="actionNew"/>
     <addaction name="separator"/>
-    <addaction name="actionClose"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -403,7 +403,7 @@
     <string>New</string>
    </property>
   </action>
-  <action name="actionClose">
+  <action name="actionExit">
    <property name="text">
     <string>Exit</string>
    </property>
