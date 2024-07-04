@@ -63,6 +63,7 @@ def prepare_detections(output_dict, valid_classes):
 
     return detections, centers
 
+
 def initialize_tracker(embedder='mobilenet'):
     tracker = DeepSort(max_age=30, n_init=3, nms_max_overlap=1.0, embedder=embedder, half=True, bgr=True)
     return tracker

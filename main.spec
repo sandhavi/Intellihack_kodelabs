@@ -4,7 +4,10 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('data', 'data')],  # Add this line to include the data folder
+    datas=[
+        ('data', 'data'),
+        ('C:/Users/kenur/anaconda3/envs/tf2/Lib/site-packages/deep_sort_realtime/embedder/weights', 'deep_sort_realtime/embedder/weights')
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

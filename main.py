@@ -1,12 +1,19 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
+import os
 import sys
 import cv2
 import time
+from PyQt5 import QtWidgets, QtGui, QtCore
 from model import load_model, run_inference_for_single_image, prepare_detections, initialize_tracker
 from object_detection.utils import label_map_util
 from pyqt5_ui.main_window import Ui_MainWindow
 from pyqt5_ui.video_widget import Ui_VideoWidget
 from pyqt5_ui.chat_widget import Ui_ChatWidget
+
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
 
 
 class DetectionThread(QtCore.QThread):
@@ -16,10 +23,11 @@ class DetectionThread(QtCore.QThread):
         super(DetectionThread, self).__init__(parent)
         self.keep_running = True
         self.cap = cv2.VideoCapture(0)
-        self.detection_model = load_model("data/models/ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model")
-        self.category_index = label_map_util.create_category_index_from_labelmap("data/label_maps/mscoco_label_map.pbtxt", use_display_name=True)
+        model_path = resource_path("data/models/ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model")
+        self.detection_model = load_model(model_path)
+        self.category_index = label_map_util.create_category_index_from_labelmap(resource_path("data/label_maps/mscoco_label_map.pbtxt"), use_display_name=True)
         self.valid_classes = [1]
-        self.tracker = initialize_tracker(embedder='mobilenet')
+        self.tracker = initialize_tracker(embedder="mobilenet")
 
     def run(self):
         while self.keep_running:
