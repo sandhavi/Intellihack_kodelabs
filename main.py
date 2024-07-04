@@ -80,6 +80,11 @@ class VideoWidget(QtWidgets.QWidget, Ui_VideoWidget):
         super(VideoWidget, self).__init__()
         self.setupUi(self)
 
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if hasattr(self, 'mainWindow'):
+            self.mainWindow.update_image_position()
+
 
 class ChatWidget(QtWidgets.QWidget, Ui_ChatWidget):
     def __init__(self):
@@ -95,6 +100,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # Initialize the VideoWidget
         self.videoWidget = VideoWidget()
         self.videoWidget.hide()
+        self.videoWidget.mainWindow = self
 
         # Initialize the ChatWidget
         self.chatWidget = ChatWidget()
@@ -102,7 +108,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Connect the signals to slots of video widget toggle
         self.videoWidget.showEvent = self.on_video_widget_open
-        self.videoWidget.hideEvent = self.on_video_widget_close
 
         # Startup actions
         self.setup_camera_view()
@@ -124,10 +129,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def on_video_widget_open(self, event):
         self.resume_detection_thread()
         super().showEvent(event)
-
-    def on_video_widget_close(self, event):
-        self.pause_detection_thread()
-        super().hideEvent(event)
 
     def open_chat_widget(self):
         if not self.chatWidget.isVisible():
@@ -187,10 +188,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.scene.clear()
         self.image_item = self.scene.addPixmap(pixmap)
         self.videoWidget.cameraGraphicsView.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
-        self.update_image_position()
-
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
         self.update_image_position()
 
     def update_image_position(self):
