@@ -9,6 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from utills import resource_path
 
 
 class Ui_ChatWidget(object):
@@ -16,7 +17,7 @@ class Ui_ChatWidget(object):
         ChatWidget.setObjectName("ChatWidget")
         ChatWidget.resize(355, 348)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("pyqt5_ui\\../data/images/icons/favicon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(resource_path("pyqt5_ui\\../data/images/icons/favicon.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         ChatWidget.setWindowIcon(icon)
         ChatWidget.setToolTip("")
         self.verticalLayout = QtWidgets.QVBoxLayout(ChatWidget)
@@ -48,7 +49,7 @@ class Ui_ChatWidget(object):
         self.messageButton.setMaximumSize(QtCore.QSize(31, 31))
         self.messageButton.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("pyqt5_ui\\../data/images/icons/send.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(resource_path("pyqt5_ui\\../data/images/icons/send.svg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.messageButton.setIcon(icon1)
         self.messageButton.setObjectName("messageButton")
         self.horizontalLayout.addWidget(self.messageButton)

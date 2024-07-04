@@ -8,12 +8,7 @@ from object_detection.utils import label_map_util
 from pyqt5_ui.main_window import Ui_MainWindow
 from pyqt5_ui.video_widget import Ui_VideoWidget
 from pyqt5_ui.chat_widget import Ui_ChatWidget
-
-
-def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
-    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
-    return os.path.join(base_path, relative_path)
+from utills import resource_path
 
 
 class DetectionThread(QtCore.QThread):
@@ -21,16 +16,25 @@ class DetectionThread(QtCore.QThread):
 
     def __init__(self, parent=None):
         super(DetectionThread, self).__init__(parent)
-        self.keep_running = True
+        self._running = True
+        self._paused = False
+        self.mutex = QtCore.QMutex()
+        self.pause_condition = QtCore.QWaitCondition()
         self.cap = cv2.VideoCapture(0)
         model_path = resource_path("data/models/ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model")
         self.detection_model = load_model(model_path)
-        self.category_index = label_map_util.create_category_index_from_labelmap(resource_path("data/label_maps/mscoco_label_map.pbtxt"), use_display_name=True)
+        self.category_index = label_map_util.create_category_index_from_labelmap(
+            resource_path("data/label_maps/mscoco_label_map.pbtxt"), use_display_name=True)
         self.valid_classes = [1]
         self.tracker = initialize_tracker(embedder="mobilenet")
 
     def run(self):
-        while self.keep_running:
+        while self._running:
+            self.mutex.lock()
+            if self._paused:
+                self.pause_condition.wait(self.mutex)
+            self.mutex.unlock()
+
             ret, frame = self.cap.read()
             if not ret:
                 break
@@ -43,7 +47,8 @@ class DetectionThread(QtCore.QThread):
                 track_id = track.track_id
                 ltrb = track.to_ltrb()
                 cv2.rectangle(frame, (int(ltrb[0]), int(ltrb[1])), (int(ltrb[2]), int(ltrb[3])), (0, 255, 0), 2)
-                cv2.putText(frame, f'ID: {track_id}', (int(ltrb[0]), int(ltrb[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                cv2.putText(frame, f'ID: {track_id}', (int(ltrb[0]), int(ltrb[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                            (0, 255, 0), 1)
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             height, width, channel = frame.shape
             bytes_per_line = 3 * width
@@ -52,8 +57,22 @@ class DetectionThread(QtCore.QThread):
             time.sleep(0.01)
 
     def stop(self):
-        self.keep_running = False
-        self.cap.release()
+        self._running = False
+        self.resume()  # Ensure thread is not paused when stopping
+
+    def pause(self):
+        self.mutex.lock()
+        self._paused = True
+        self.mutex.unlock()
+
+    def resume(self):
+        self.mutex.lock()
+        self._paused = False
+        self.mutex.unlock()
+        self.pause_condition.wakeAll()
+
+    def is_running(self):
+        return self._running and not self._paused
 
 
 class VideoWidget(QtWidgets.QWidget, Ui_VideoWidget):
@@ -73,30 +92,47 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__()
         self.setupUi(self)
 
-        # Initialize the widgets
+        # Initialize the VideoWidget
         self.videoWidget = VideoWidget()
+        self.videoWidget.hide()
+
+        # Initialize the ChatWidget
         self.chatWidget = ChatWidget()
+        self.chatWidget.hide()
+
+        # Connect the signals to slots of video widget toggle
+        self.videoWidget.showEvent = self.on_video_widget_open
+        self.videoWidget.hideEvent = self.on_video_widget_close
 
         # Startup actions
         self.setup_camera_view()
         self.start_detection_thread()
-        self.connect_buttons()
+        self.pause_detection_thread()
 
         # Create the menu slots
         self.actionVideo_Panel.triggered.connect(self.open_video_widget)
         self.actionChat.triggered.connect(self.open_chat_widget)
 
+        # Main window button slots
+        self.powerToggleButton.clicked.connect(self.toggle_detection_thread)
+
     def open_video_widget(self):
-        if self.videoWidget.isVisible():
+        if not self.videoWidget.isVisible():
             self.videoWidget.show()
-        else:
-            self.videoWidget.show()
+            self.videoWidget.raise_()
+
+    def on_video_widget_open(self, event):
+        self.resume_detection_thread()
+        super().showEvent(event)
+
+    def on_video_widget_close(self, event):
+        self.pause_detection_thread()
+        super().hideEvent(event)
 
     def open_chat_widget(self):
-        if self.chatWidget.isVisible():
+        if not self.chatWidget.isVisible():
             self.chatWidget.show()
-        else:
-            self.chatWidget.show()
+            self.chatWidget.raise_()
 
     def setup_camera_view(self):
         self.aspectRatio = 4 / 3
@@ -113,14 +149,37 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.detection_thread.frame_updated.connect(self.update_frame)
         self.detection_thread.start()
         QtCore.QCoreApplication.instance().aboutToQuit.connect(self.detection_thread.stop)
+        self.toggle_power_button_design(False)
 
-    def connect_buttons(self):
-        # self.stopButton.clicked.connect(self.stop_detection)
-        # self.pauseButton.clicked.connect(self.pause_video)
-        pass
+    def stop_detection_thread(self):
+        if self.detection_thread:
+            self.detection_thread.stop()
+            self.detection_thread.wait()
+            self.videoWidget.hide()
+            self.toggle_power_button_design(True)
 
-    def stop_detection(self):
-        self.detection_thread.stop()
+    def pause_detection_thread(self):
+        if self.detection_thread:
+            self.detection_thread.pause()
+            self.videoWidget.hide()
+            self.toggle_power_button_design(True)
+
+    def resume_detection_thread(self):
+        if self.detection_thread:
+            self.detection_thread.resume()
+            self.toggle_power_button_design(False)
+
+    def toggle_detection_thread(self):
+        if self.detection_thread and self.detection_thread.is_running():
+            self.pause_detection_thread()
+        else:
+            self.resume_detection_thread()
+
+    def toggle_power_button_design(self, activated):
+        if activated:
+            self.powerToggleButton.setStyleSheet("background-color: none; color: black;")
+        else:
+            self.powerToggleButton.setStyleSheet("background-color: #36d13c; color: white;")
 
     def update_frame(self, q_image):
         pixmap = QtGui.QPixmap.fromImage(q_image)
