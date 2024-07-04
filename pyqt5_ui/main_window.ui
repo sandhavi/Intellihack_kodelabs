@@ -308,7 +308,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="xLineEdit"/>
+            <widget class="QLineEdit" name="xLineEdit">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -340,7 +344,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="yLineEdit"/>
+            <widget class="QLineEdit" name="yLineEdit">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>

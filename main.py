@@ -17,13 +17,14 @@ import config
 class DetectionThread(QtCore.QThread):
     frame_updated = QtCore.pyqtSignal(QtGui.QImage)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, camera_index=0):
         super(DetectionThread, self).__init__(parent)
         self._running = True
         self._paused = False
+        self.camera_index = camera_index
         self.mutex = QtCore.QMutex()
         self.pause_condition = QtCore.QWaitCondition()
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(self.camera_index)
         model_path = resource_path(config.DetectionModel)
         self.detection_model = load_model(model_path)
         self.category_index = label_map_util.create_category_index_from_labelmap(resource_path(config.LabelMap), use_display_name=True)
@@ -61,6 +62,7 @@ class DetectionThread(QtCore.QThread):
     def stop(self):
         self._running = False
         self.resume()  # Ensure thread is not paused when stopping
+        self.cap.release()
 
     def pause(self):
         self.mutex.lock()
@@ -75,6 +77,11 @@ class DetectionThread(QtCore.QThread):
 
     def is_running(self):
         return self._running and not self._paused
+
+    def update_camera(self, camera_index):
+        self.camera_index = camera_index
+        self.cap.release()
+        self.cap = cv2.VideoCapture(self.camera_index)
 
 
 class VideoWidget(QtWidgets.QWidget, Ui_VideoWidget):
@@ -124,6 +131,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Main window button slots
         self.powerToggleButton.clicked.connect(self.toggle_detection_thread)
+        self.refreshCameraListButton.clicked.connect(self.refresh_camera_list)
+        self.cameraComboBox.currentIndexChanged.connect(self.change_camera)
+
+        # Initial camera list setup
+        self.refresh_camera_list()
 
     def open_video_widget(self):
         if not self.videoWidget.isVisible():
@@ -163,25 +175,34 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.detection_thread.frame_updated.connect(self.update_frame)
         self.detection_thread.start()
         QtCore.QCoreApplication.instance().aboutToQuit.connect(self.detection_thread.stop)
-        self.toggle_power_button_design(False)
+        self.toggle_power_button(False)
 
     def stop_detection_thread(self):
         if self.detection_thread:
+            self.cameraComboBox.setEnabled(False)
+            self.refreshCameraListButton.setEnabled(False)
+            self.allObjectRadioButton.setEnabled(False)
+            self.peopleObjectRadioButton.setEnabled(False)
+            self.dronesObjectRadioButton.setEnabled(False)
+            self.meanTargetRadioButton.setEnabled(False)
+            self.firstTargetRadioButton.setEnabled(False)
+            self.mostRecognizableTargetRadioButton.setEnabled(False)
+
             self.detection_thread.stop()
             self.detection_thread.wait()
             self.videoWidget.hide()
-            self.toggle_power_button_design(True)
+            self.toggle_power_button(True)
 
     def pause_detection_thread(self):
         if self.detection_thread:
             self.detection_thread.pause()
             self.videoWidget.hide()
-            self.toggle_power_button_design(True)
+            self.toggle_power_button(True)
 
     def resume_detection_thread(self):
         if self.detection_thread:
             self.detection_thread.resume()
-            self.toggle_power_button_design(False)
+            self.toggle_power_button(False)
 
     def toggle_detection_thread(self):
         if self.detection_thread and self.detection_thread.is_running():
@@ -189,10 +210,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             self.resume_detection_thread()
 
-    def toggle_power_button_design(self, activated):
+    def toggle_power_button(self, activated):
         if activated:
+            self.cameraComboBox.setEnabled(True)
+            self.refreshCameraListButton.setEnabled(True)
+            self.allObjectRadioButton.setEnabled(True)
+            self.peopleObjectRadioButton.setEnabled(True)
+            self.dronesObjectRadioButton.setEnabled(True)
+            self.meanTargetRadioButton.setEnabled(True)
+            self.firstTargetRadioButton.setEnabled(True)
+            self.mostRecognizableTargetRadioButton.setEnabled(True)
             self.powerToggleButton.setStyleSheet("background-color: none; color: black;")
         else:
+            self.cameraComboBox.setEnabled(False)
+            self.refreshCameraListButton.setEnabled(False)
+            self.allObjectRadioButton.setEnabled(False)
+            self.peopleObjectRadioButton.setEnabled(False)
+            self.dronesObjectRadioButton.setEnabled(False)
+            self.meanTargetRadioButton.setEnabled(False)
+            self.firstTargetRadioButton.setEnabled(False)
+            self.mostRecognizableTargetRadioButton.setEnabled(False)
             self.powerToggleButton.setStyleSheet("background-color: #36d13c; color: white;")
 
     def update_frame(self, q_image):
@@ -218,6 +255,32 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.image_item.setOffset(-new_width / 2, -new_height / 2)
             self.image_item.setPos(view_size.width() / 2, view_size.height() / 2)
             self.videoWidget.cameraGraphicsView.setSceneRect(0, 0, view_size.width(), view_size.height())
+
+    def refresh_camera_list(self):
+        self.cameraComboBox.clear()
+        cameras = self.get_connected_cameras()
+        for camera in cameras:
+            self.cameraComboBox.addItem(camera)
+        if cameras:
+            self.cameraComboBox.setCurrentIndex(0)
+
+    def change_camera(self):
+        selected_index = self.cameraComboBox.currentIndex()
+        self.detection_thread.update_camera(selected_index)
+
+    @staticmethod
+    def get_connected_cameras():
+        cameras = []
+        index = 0
+        while True:
+            cap = cv2.VideoCapture(index)
+            if not cap.read()[0]:
+                break
+            else:
+                cameras.append(f"Camera {index}")
+            cap.release()
+            index += 1
+        return cameras
 
 
 def main():
