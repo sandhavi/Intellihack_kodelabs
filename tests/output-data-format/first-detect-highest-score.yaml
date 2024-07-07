@@ -1,0 +1,45 @@
+- objects:
+    - coordinates:
+        x: 319
+        y: 336
+      id: 12
+      class_name: 'person'
+    - coordinates:
+        x: 312
+        y: 326
+      id: 13
+      class_name: 'drone'
+  timestamp: '2024-07-01T02:32:30.048102'
+- objects:
+  - coordinates:
+      x: 119
+      y: 213
+    id: 12
+    class_name: 'person'
+  - coordinates:
+      x: 784
+      y: 789
+    id: 13
+    class_name: 'drone'
+  timestamp: '2024-07-01T02:32:26.873212'
+- objects:
+  - coordinates:
+      x: 312
+      y: 326
+    id: 12
+    class_name: 'person'
+  timestamp: '2024-07-01T02:32:28.828198'
+- objects:
+  - coordinates:
+      x: 456.4
+      y: 456.4
+    id: 12
+    class_name: 'person'
+  timestamp: '2024-07-01T02:32:29.748402'
+- objects:
+  - coordinates:
+      x: 234
+      y: 345
+    id: 12
+    class_name: 'person'
+  timestamp: '2024-07-01T02:32:29.948502'
