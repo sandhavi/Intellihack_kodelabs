@@ -41,7 +41,7 @@ def run_inference_for_single_image(model, image):
     return output_dict
 
 
-def prepare_detections(output_dict, valid_classes):
+def prepare_detections(output_dict, valid_classes, category_index):
     detection_boxes = output_dict['detection_boxes']
     detection_classes = output_dict['detection_classes']
     detection_scores = output_dict['detection_scores']
@@ -49,6 +49,7 @@ def prepare_detections(output_dict, valid_classes):
     detections = []
     centers = []
     scores = []
+    class_names = []
     for i in range(detection_boxes.shape[0]):
         if detection_scores[i] >= 0.5 and detection_classes[i] in valid_classes:
             box = detection_boxes[i]
@@ -65,8 +66,9 @@ def prepare_detections(output_dict, valid_classes):
             center_y = (ymin + ymax) // 2
             centers.append((center_x, center_y))
             scores.append(score)
+            class_names.append(category_index[class_id]['name'])
 
-    return detections, centers, scores
+    return detections, centers, scores, class_names
 
 
 def initialize_tracker(embedder='mobilenet'):
