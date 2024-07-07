@@ -24,3 +24,13 @@ ComPort = "COM5"
 
 # Baud Rate
 BaudRate = 9600
+
+ImageTotalWidthPixels = 640
+ImageTotalHeightPixels = 480
+
+# in mm
+ImageRealWidth = 2
+ImageRealHeight = 0
+
+# In mm
+RealRadius = 47
