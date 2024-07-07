@@ -235,7 +235,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="mostRecognizableTargetRadioButton">
+          <widget class="QRadioButton" name="mostRecognizableTargetAlgorithmRadioButton">
            <property name="text">
             <string>Most Recognizable</string>
            </property>

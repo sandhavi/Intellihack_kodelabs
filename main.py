@@ -6,6 +6,8 @@ import numpy as np
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtCore import QUrl
+
+import utills
 from model import load_model, run_inference_for_single_image, prepare_detections, initialize_tracker
 from object_detection.utils import label_map_util
 from pyqt5_ui.main_window import Ui_MainWindow
@@ -17,6 +19,7 @@ import config
 
 class DetectionThread(QtCore.QThread):
     frame_updated = QtCore.pyqtSignal(QtGui.QImage)
+    update_data_signal = QtCore.pyqtSignal(object, int, int)  # Signal for updating data fields
 
     def __init__(self, parent=None, camera_index=0):
         super(DetectionThread, self).__init__(parent)
@@ -58,6 +61,8 @@ class DetectionThread(QtCore.QThread):
             # Switch between algorithms
             if config.TargetAlgorithm == "M":
                 # Mean Target
+                mean_center_x = None
+                mean_center_y = None
                 # Draw center points
                 for center in centers:
                     cv2.drawMarker(frame, center, (0, 0, 255), markerType=cv2.MARKER_CROSS, markerSize=10, thickness=1, line_type=cv2.LINE_AA)
@@ -79,6 +84,7 @@ class DetectionThread(QtCore.QThread):
                     x_center = int((ltrb[0] + ltrb[2]) / 2)
                     y_center = int((ltrb[1] + ltrb[3]) / 2)
                     cv2.putText(frame, f'F-ID: {track_id}', ((x_center + 10), (y_center - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+                self.update_data_signal.emit([], mean_center_x, mean_center_y)
 
             if config.TargetAlgorithm == "F":
                 # First Seen Target
@@ -102,6 +108,7 @@ class DetectionThread(QtCore.QThread):
                         y_center = int((ltrb[1] + ltrb[3]) / 2)
                         cv2.drawMarker(frame, (x_center, y_center), (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
                         cv2.putText(frame, f'F-ID: {track_id}', ((x_center + 10), (y_center - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                        self.update_data_signal.emit([], x_center, y_center)
                         first_track_lost = False
                         break
                 else:
@@ -120,6 +127,7 @@ class DetectionThread(QtCore.QThread):
                     max_center = centers[max_score_index]
                     cv2.drawMarker(frame, max_center, (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
                     cv2.putText(frame, f'MR', ((max_center[0] + 10), (max_center[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                    self.update_data_signal.emit([], max_center[0], max_center[1])
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             height, width, channel = frame.shape
@@ -230,6 +238,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def update_target_algorithm_type(value):
         config.TargetAlgorithm = value
 
+    def update_data_fields(self, objects, x, y):
+        self.xLineEdit.setText(utills.set_text(x))
+        self.yLineEdit.setText(utills.set_text(y))
+
     def open_video_widget(self):
         if not self.videoWidget.isVisible():
             self.videoWidget.show()
@@ -266,6 +278,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def start_detection_thread(self):
         self.detection_thread = DetectionThread()
         self.detection_thread.frame_updated.connect(self.update_frame)
+        self.detection_thread.update_data_signal.connect(self.update_data_fields)
         self.detection_thread.start()
         QtCore.QCoreApplication.instance().aboutToQuit.connect(self.detection_thread.stop)
         self.toggle_power_button(False)
