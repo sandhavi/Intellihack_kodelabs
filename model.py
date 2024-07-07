@@ -11,9 +11,11 @@ utils_ops.tf = tf.compat.v1
 # Patch the location of gfile
 tf.gfile = tf.io.gfile
 
+
 def load_model(model_path):
     model = tf.saved_model.load(model_path)
     return model
+
 
 def run_inference_for_single_image(model, image):
     image = np.asarray(image)
@@ -37,6 +39,7 @@ def run_inference_for_single_image(model, image):
         output_dict['detection_masks_reframed'] = detection_masks_reframed.numpy()
 
     return output_dict
+
 
 def prepare_detections(output_dict, valid_classes):
     detection_boxes = output_dict['detection_boxes']

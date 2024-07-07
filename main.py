@@ -2,6 +2,7 @@ import os
 import sys
 import cv2
 import time
+import numpy as np
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtCore import QUrl
@@ -44,6 +45,7 @@ class DetectionThread(QtCore.QThread):
             output_dict = run_inference_for_single_image(self.detection_model, frame)
             detections, centers = prepare_detections(output_dict, self.valid_classes)
             tracks = self.tracker.update_tracks(detections, frame=frame)
+            """
             for track in tracks:
                 if not track.is_confirmed():
                     continue
@@ -52,6 +54,21 @@ class DetectionThread(QtCore.QThread):
                 cv2.rectangle(frame, (int(ltrb[0]), int(ltrb[1])), (int(ltrb[2]), int(ltrb[3])), (0, 255, 0), 2)
                 cv2.putText(frame, f'ID: {track_id}', (int(ltrb[0]), int(ltrb[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                             (0, 255, 0), 1)
+            """
+            # Switch between algorithms
+            if config.TargetAlgorithm == "M":
+                # Draw center points
+                for center in centers:
+                    cv2.drawMarker(frame, center, (0, 0, 255), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=2, line_type=cv2.LINE_AA)
+                # Calculate and draw the mean center point if there are any bounding boxes
+                if centers:
+                    mean_center_x = int(np.mean([center[0] for center in centers]))
+                    mean_center_y = int(np.mean([center[1] for center in centers]))
+                    mean_center = (mean_center_x, mean_center_y)
+                    cv2.drawMarker(frame, mean_center, (255, 0, 0), markerType=cv2.MARKER_CROSS, markerSize=30, thickness=2, line_type=cv2.LINE_AA)
+                    cv2.putText(frame, f'Mean Center', (mean_center_x + 10, mean_center_y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+            else:
+                print()
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             height, width, channel = frame.shape
             bytes_per_line = 3 * width
@@ -136,6 +153,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Initial camera list setup
         self.refresh_camera_list()
+
+        # Target type selection
+        self.allObjectRadioButton.stateChanged.connect(lambda: self.update_target_type([1, 44]))    # All Objects
+        self.peopleObjectRadioButton.stateChanged.connect(lambda: self.update_target_type([1]))     # People
+        self.dronesObjectRadioButton.stateChanged.connect(lambda: self.update_target_type([44]))    # Bottles
+        self.allObjectRadioButton.setChecked(True)
+
+        # Targeting algorithm / position type
+        self.meanTargetRadioButton.stateChanged.connect(lambda: self.update_target_algorithm_type('M'))                  # Mean Target
+        self.firstTargetRadioButton.stateChanged.connect(lambda: self.update_target_algorithm_type('F'))                 # First Target
+        self.mostRecognizableTargetRadioButton.stateChanged.connect(lambda: self.update_target_algorithm_type('MR'))     # Most Recognizable target
+        self.meanTargetRadioButton.setChecked(True)
+
+    @staticmethod
+    def update_target_type(value):
+        config.ValidClasses = value
+
+    @staticmethod
+    def update_target_algorithm_type(value):
+        config.TargetAlgorithm = value
 
     def open_video_widget(self):
         if not self.videoWidget.isVisible():

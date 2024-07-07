@@ -37,4 +37,3 @@ pyuic5 -o pyqt5_ui/chat_widget.py pyqt5_ui/chat_widget.ui
 ## Update app settings
 
 Update variable values in the `config.py`.
-
