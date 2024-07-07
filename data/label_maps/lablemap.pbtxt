@@ -1,0 +1,30 @@
+item {
+    id: 1
+    name: 'delivery_drone'
+}
+
+item {
+    id: 2
+    name: 'military_drone'
+}
+
+item {
+    id: 3
+    name: 'professional_drone'
+}
+
+item {
+    id: 4
+    name: 'racing_drone'
+}
+
+item {
+    id: 5
+    name: 'consumer_drone'
+}
+
+item {
+    id: 6
+    name: 'person'
+}
+
