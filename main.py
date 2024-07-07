@@ -43,7 +43,7 @@ class DetectionThread(QtCore.QThread):
             if not ret:
                 break
             output_dict = run_inference_for_single_image(self.detection_model, frame)
-            detections, centers = prepare_detections(output_dict, self.valid_classes)
+            detections, centers, scores = prepare_detections(output_dict, self.valid_classes)
             tracks = self.tracker.update_tracks(detections, frame=frame)
             """
             for track in tracks:
@@ -57,18 +57,71 @@ class DetectionThread(QtCore.QThread):
             """
             # Switch between algorithms
             if config.TargetAlgorithm == "M":
+                # Mean Target
                 # Draw center points
                 for center in centers:
-                    cv2.drawMarker(frame, center, (0, 0, 255), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=2, line_type=cv2.LINE_AA)
+                    cv2.drawMarker(frame, center, (0, 0, 255), markerType=cv2.MARKER_CROSS, markerSize=10, thickness=1, line_type=cv2.LINE_AA)
                 # Calculate and draw the mean center point if there are any bounding boxes
                 if centers:
                     mean_center_x = int(np.mean([center[0] for center in centers]))
                     mean_center_y = int(np.mean([center[1] for center in centers]))
                     mean_center = (mean_center_x, mean_center_y)
-                    cv2.drawMarker(frame, mean_center, (255, 0, 0), markerType=cv2.MARKER_CROSS, markerSize=30, thickness=2, line_type=cv2.LINE_AA)
-                    cv2.putText(frame, f'Mean Center', (mean_center_x + 10, mean_center_y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
-            else:
-                print()
+                    cv2.drawMarker(frame, mean_center, (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
+                    cv2.putText(frame, f'M', (mean_center_x + 10, mean_center_y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+
+                # Add the target ID
+                for track in tracks:
+                    if not track.is_confirmed():
+                        continue
+
+                    track_id = track.track_id
+                    ltrb = track.to_ltrb()
+                    track_center_index = np.argmax(ltrb)
+                    track_center = centers[track_center_index]
+                    cv2.putText(frame, f'M-ID: {track_id}', (track_center[0] + 10, track_center[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+
+            if config.TargetAlgorithm == "F":
+                # First Seen Target
+                first_track_id = None
+                first_track_lost = False
+
+                # Visualization
+                for track in tracks:
+                    if not track.is_confirmed():
+                        continue
+
+                    track_id = track.track_id
+                    ltrb = track.to_ltrb()
+
+                    # Track the first detected object
+                    if first_track_id is None:
+                        first_track_id = track_id
+
+                    if track_id == first_track_id:
+                        track_center_index = np.argmax(ltrb)
+                        track_center = centers[track_center_index]
+                        cv2.drawMarker(frame, track_center, (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
+                        cv2.putText(frame, f'F-ID: {track_id}', (track_center[0] + 10, track_center[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+
+                        first_track_lost = False
+                        break
+                else:
+                    # No confirmed tracks found
+                    if first_track_id is not None:
+                        first_track_lost = True
+
+                if first_track_lost:
+                    first_track_id = None
+
+            if config.TargetAlgorithm == "MR":
+                # Most Recognizable Target
+                # Select the highest score object
+                if scores:
+                    max_score_index = np.argmax(scores)
+                    max_center = centers[max_score_index]
+                    cv2.drawMarker(frame, max_center, (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
+                    cv2.putText(frame, f'MR', (max_center[0] + 10, max_center[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             height, width, channel = frame.shape
             bytes_per_line = 3 * width
@@ -153,17 +206,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Initial camera list setup
         self.refresh_camera_list()
-
-        # Target type selection
-        self.allObjectRadioButton.stateChanged.connect(lambda: self.update_target_type([1, 44]))    # All Objects
-        self.peopleObjectRadioButton.stateChanged.connect(lambda: self.update_target_type([1]))     # People
-        self.dronesObjectRadioButton.stateChanged.connect(lambda: self.update_target_type([44]))    # Bottles
+        self.allObjectRadioButton.toggled.connect(
+            lambda checked: self.update_target_type([1, 44]) if checked else None)  # All Objects
+        self.peopleObjectRadioButton.toggled.connect(
+            lambda checked: self.update_target_type([1]) if checked else None)  # People
+        self.dronesObjectRadioButton.toggled.connect(
+            lambda checked: self.update_target_type([44]) if checked else None)  # Bottles
         self.allObjectRadioButton.setChecked(True)
 
         # Targeting algorithm / position type
-        self.meanTargetRadioButton.stateChanged.connect(lambda: self.update_target_algorithm_type('M'))                  # Mean Target
-        self.firstTargetRadioButton.stateChanged.connect(lambda: self.update_target_algorithm_type('F'))                 # First Target
-        self.mostRecognizableTargetRadioButton.stateChanged.connect(lambda: self.update_target_algorithm_type('MR'))     # Most Recognizable target
+        self.meanTargetRadioButton.toggled.connect(
+            lambda checked: self.update_target_algorithm_type('M') if checked else None)  # Mean Target
+        self.firstTargetRadioButton.toggled.connect(
+            lambda checked: self.update_target_algorithm_type('F') if checked else None)  # First Target
+        self.mostRecognizableTargetRadioButton.toggled.connect(
+            lambda checked: self.update_target_algorithm_type('MR') if checked else None)  # Most Recognizable Target
         self.meanTargetRadioButton.setChecked(True)
 
     @staticmethod

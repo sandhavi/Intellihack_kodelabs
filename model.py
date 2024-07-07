@@ -48,6 +48,7 @@ def prepare_detections(output_dict, valid_classes):
 
     detections = []
     centers = []
+    scores = []
     for i in range(detection_boxes.shape[0]):
         if detection_scores[i] >= 0.5 and detection_classes[i] in valid_classes:
             box = detection_boxes[i]
@@ -63,8 +64,9 @@ def prepare_detections(output_dict, valid_classes):
             center_x = (xmin + xmax) // 2
             center_y = (ymin + ymax) // 2
             centers.append((center_x, center_y))
+            scores.append(score)
 
-    return detections, centers
+    return detections, centers, scores
 
 
 def initialize_tracker(embedder='mobilenet'):
