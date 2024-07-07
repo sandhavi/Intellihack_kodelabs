@@ -15,7 +15,53 @@ from pyqt5_ui.video_widget import Ui_VideoWidget
 from pyqt5_ui.chat_widget import Ui_ChatWidget
 from utills import resource_path
 import config
-import arduino_serial_com
+
+
+class SerialThread(QtCore.QThread):
+    def __init__(self, parent=None):
+        super(SerialThread, self).__init__(parent)
+        self._running = True
+        self._paused = False
+        self.mutex = QtCore.QMutex()
+        self.pause_condition = QtCore.QWaitCondition()
+        self.ser = None
+
+    def run(self):
+        if not self.ser:
+            self.ser = serial.Serial(config.ComPort, config.BaudRate, timeout=1)
+            time.sleep(2)  # Give some time for the connection to establish
+
+        while self._running:
+            self.mutex.lock()
+            if self._paused:
+                self.pause_condition.wait(self.mutex)
+            self.mutex.unlock()
+            # Implement sending data logic here
+
+    def send_data(self, data):
+        """Send data to the Arduino."""
+        if self.ser and self.ser.is_open:
+            try:
+                self.ser.write(data.encode())
+            except serial.SerialException as e:
+                print(f"Error sending data: {e}")
+
+    def stop(self):
+        self._running = False
+        self.resume()  # Ensure thread is not paused when stopping
+        if self.ser and self.ser.is_open:
+            self.ser.close()
+
+    def pause(self):
+        self.mutex.lock()
+        self._paused = True
+        self.mutex.unlock()
+
+    def resume(self):
+        self.mutex.lock()
+        self._paused = False
+        self.mutex.unlock()
+        self.pause_condition.wakeAll()
 
 
 class DetectionThread(QtCore.QThread):
@@ -35,10 +81,11 @@ class DetectionThread(QtCore.QThread):
         self.category_index = label_map_util.create_category_index_from_labelmap(resource_path(config.LabelMap), use_display_name=True)
         self.valid_classes = config.ValidClasses
         self.tracker = initialize_tracker(embedder=config.DeepsortTracker)
+        self.serial_thread = SerialThread()
         self.send_signal = False  # Flag to control sending data to Arduino
-        self.ser = None  # Arduino serial connection
 
     def run(self):
+        self.serial_thread.start()
         while self._running:
             self.mutex.lock()
             if self._paused:
@@ -88,7 +135,7 @@ class DetectionThread(QtCore.QThread):
                     y_center = int((ltrb[1] + ltrb[3]) / 2)
                     cv2.putText(frame, f'F-ID: {track_id}', ((x_center + 10), (y_center - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
                 if self.send_signal:
-                    arduino_serial_com.send_data(self.ser, mean_center_x, mean_center_y)
+                    self.serial_thread.send_data(f"{mean_center_x},{mean_center_y}\n")
                 self.update_data_signal.emit(", ".join(class_names), mean_center_x, mean_center_y)
 
             if config.TargetAlgorithm == "F":
@@ -114,7 +161,7 @@ class DetectionThread(QtCore.QThread):
                         cv2.drawMarker(frame, (x_center, y_center), (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
                         cv2.putText(frame, f'F-ID: {track_id}', ((x_center + 10), (y_center - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
                         if self.send_signal:
-                            arduino_serial_com.send_data(self.ser, x_center, y_center)
+                            self.serial_thread.send_data(f"{x_center},{y_center}\n")
                         self.update_data_signal.emit(", ".join(class_names), x_center, y_center)
                         first_track_lost = False
                         break
@@ -135,7 +182,7 @@ class DetectionThread(QtCore.QThread):
                     cv2.drawMarker(frame, max_center, (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
                     cv2.putText(frame, f'MR', ((max_center[0] + 10), (max_center[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
                     if self.send_signal:
-                        arduino_serial_com.send_data(self.ser, max_center[0], max_center[1])
+                        self.serial_thread.send_data(f"{max_center[0]},{max_center[1]}\n")
                     self.update_data_signal.emit(", ".join(class_names), max_center[0], max_center[1])
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -172,13 +219,6 @@ class DetectionThread(QtCore.QThread):
 
     def set_send_signal(self, state):
         self.send_signal = state
-        if self.send_signal and self.ser is not None:
-            self.ser = serial.Serial(config.ComPort, config.BaudRate, timeout=1)
-            time.sleep(2)  # Give some time for the connection to establish
-        else:
-            if hasattr(self, 'ser') and self.ser is not None:
-                self.ser.close()
-                del self.ser
 
 class VideoWidget(QtWidgets.QWidget, Ui_VideoWidget):
     def __init__(self):
