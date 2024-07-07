@@ -78,7 +78,7 @@ class DetectionThread(QtCore.QThread):
                     ltrb = track.to_ltrb()
                     x_center = int((ltrb[0] + ltrb[2]) / 2)
                     y_center = int((ltrb[1] + ltrb[3]) / 2)
-                    cv2.putText(frame, f'F-ID: {track_id}', (int(x_center), int(y_center - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+                    cv2.putText(frame, f'F-ID: {track_id}', ((x_center + 10), (y_center - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
 
             if config.TargetAlgorithm == "F":
                 # First Seen Target
@@ -101,7 +101,7 @@ class DetectionThread(QtCore.QThread):
                         x_center = int((ltrb[0] + ltrb[2]) / 2)
                         y_center = int((ltrb[1] + ltrb[3]) / 2)
                         cv2.drawMarker(frame, (x_center, y_center), (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
-                        cv2.putText(frame, f'F-ID: {track_id}', (x_center, int(y_center-10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                        cv2.putText(frame, f'F-ID: {track_id}', ((x_center + 10), (y_center - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
                         first_track_lost = False
                         break
                 else:
@@ -119,7 +119,7 @@ class DetectionThread(QtCore.QThread):
                     max_score_index = np.argmax(scores)
                     max_center = centers[max_score_index]
                     cv2.drawMarker(frame, max_center, (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
-                    cv2.putText(frame, f'MR', (max_center[0] + 10, max_center[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                    cv2.putText(frame, f'MR', ((max_center[0] + 10), (max_center[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             height, width, channel = frame.shape
