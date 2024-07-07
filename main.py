@@ -46,7 +46,7 @@ class DetectionThread(QtCore.QThread):
             if not ret:
                 break
             output_dict = run_inference_for_single_image(self.detection_model, frame)
-            detections, centers, scores = prepare_detections(output_dict, self.valid_classes)
+            detections, centers, scores, class_names = prepare_detections(output_dict, self.valid_classes, self.category_index)
             tracks = self.tracker.update_tracks(detections, frame=frame)
             """
             for track in tracks:
@@ -84,7 +84,7 @@ class DetectionThread(QtCore.QThread):
                     x_center = int((ltrb[0] + ltrb[2]) / 2)
                     y_center = int((ltrb[1] + ltrb[3]) / 2)
                     cv2.putText(frame, f'F-ID: {track_id}', ((x_center + 10), (y_center - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
-                self.update_data_signal.emit([], mean_center_x, mean_center_y)
+                self.update_data_signal.emit(", ".join(class_names), mean_center_x, mean_center_y)
 
             if config.TargetAlgorithm == "F":
                 # First Seen Target
@@ -108,7 +108,7 @@ class DetectionThread(QtCore.QThread):
                         y_center = int((ltrb[1] + ltrb[3]) / 2)
                         cv2.drawMarker(frame, (x_center, y_center), (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
                         cv2.putText(frame, f'F-ID: {track_id}', ((x_center + 10), (y_center - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-                        self.update_data_signal.emit([], x_center, y_center)
+                        self.update_data_signal.emit(", ".join(class_names), x_center, y_center)
                         first_track_lost = False
                         break
                 else:
@@ -127,7 +127,7 @@ class DetectionThread(QtCore.QThread):
                     max_center = centers[max_score_index]
                     cv2.drawMarker(frame, max_center, (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
                     cv2.putText(frame, f'MR', ((max_center[0] + 10), (max_center[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-                    self.update_data_signal.emit([], max_center[0], max_center[1])
+                    self.update_data_signal.emit(", ".join(class_names), max_center[0], max_center[1]) # convert class_names array to string like:- class_name_1, class_name_2
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             height, width, channel = frame.shape
@@ -239,6 +239,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         config.TargetAlgorithm = value
 
     def update_data_fields(self, objects, x, y):
+        self.objectLineEdit.setText(objects)
         self.xLineEdit.setText(utills.set_text(x))
         self.yLineEdit.setText(utills.set_text(y))
 
