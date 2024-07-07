@@ -18,3 +18,9 @@ TargetAlgorithm = "M"
 
 # App help page
 HelpURL = "https://github.com/sandhavi/Intellihack_kodelabs/blob/main/README.md"
+
+# Replace 'COM5' with your Arduino's serial port
+ComPort = "COM5"
+
+# Baud Rate
+BaudRate = 9600
