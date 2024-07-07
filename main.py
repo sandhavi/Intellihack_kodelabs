@@ -205,22 +205,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Initial camera list setup
         self.refresh_camera_list()
-        self.allObjectRadioButton.toggled.connect(
+        self.targetAllRadioButton.toggled.connect(
             lambda checked: self.update_target_type([1, 44]) if checked else None)  # All Objects
-        self.peopleObjectRadioButton.toggled.connect(
+        self.targetPeopleRadioButton.toggled.connect(
             lambda checked: self.update_target_type([1]) if checked else None)  # People
-        self.dronesObjectRadioButton.toggled.connect(
+        self.targetDronesRadioButton.toggled.connect(
             lambda checked: self.update_target_type([44]) if checked else None)  # Bottles
-        self.allObjectRadioButton.setChecked(True)
+        self.targetAllRadioButton.setChecked(True)
 
         # Targeting algorithm / position type
-        self.meanTargetRadioButton.toggled.connect(
+        self.meanTargetAlgorithmRadioButton.toggled.connect(
             lambda checked: self.update_target_algorithm_type('M') if checked else None)  # Mean Target
-        self.firstTargetRadioButton.toggled.connect(
+        self.firstTargetAlgorithmRadioButton.toggled.connect(
             lambda checked: self.update_target_algorithm_type('F') if checked else None)  # First Target
-        self.mostRecognizableTargetRadioButton.toggled.connect(
+        self.mostRecognizableTargetAlgorithmRadioButton.toggled.connect(
             lambda checked: self.update_target_algorithm_type('MR') if checked else None)  # Most Recognizable Target
-        self.meanTargetRadioButton.setChecked(True)
+        self.meanTargetAlgorithmRadioButton.setChecked(True)
 
     @staticmethod
     def update_target_type(value):
@@ -274,12 +274,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.detection_thread:
             self.cameraComboBox.setEnabled(False)
             self.refreshCameraListButton.setEnabled(False)
-            self.allObjectRadioButton.setEnabled(False)
-            self.peopleObjectRadioButton.setEnabled(False)
-            self.dronesObjectRadioButton.setEnabled(False)
-            self.meanTargetRadioButton.setEnabled(False)
-            self.firstTargetRadioButton.setEnabled(False)
-            self.mostRecognizableTargetRadioButton.setEnabled(False)
+            self.targetAllRadioButton.setEnabled(False)
+            self.targetPeopleRadioButton.setEnabled(False)
+            self.targetDronesRadioButton.setEnabled(False)
+            self.meanTargetAlgorithmRadioButton.setEnabled(False)
+            self.firstTargetAlgorithmRadioButton.setEnabled(False)
+            self.mostRecognizableTargetAlgorithmRadioButton.setEnabled(False)
 
             self.detection_thread.stop()
             self.detection_thread.wait()
@@ -307,22 +307,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if activated:
             self.cameraComboBox.setEnabled(True)
             self.refreshCameraListButton.setEnabled(True)
-            self.allObjectRadioButton.setEnabled(True)
-            self.peopleObjectRadioButton.setEnabled(True)
-            self.dronesObjectRadioButton.setEnabled(True)
-            self.meanTargetRadioButton.setEnabled(True)
-            self.firstTargetRadioButton.setEnabled(True)
-            self.mostRecognizableTargetRadioButton.setEnabled(True)
+            self.targetAllRadioButton.setEnabled(True)
+            self.targetPeopleRadioButton.setEnabled(True)
+            self.targetDronesRadioButton.setEnabled(True)
+            self.meanTargetAlgorithmRadioButton.setEnabled(True)
+            self.firstTargetAlgorithmRadioButton.setEnabled(True)
+            self.mostRecognizableTargetAlgorithmRadioButton.setEnabled(True)
             self.powerToggleButton.setStyleSheet("background-color: none; color: black;")
         else:
             self.cameraComboBox.setEnabled(False)
             self.refreshCameraListButton.setEnabled(False)
-            self.allObjectRadioButton.setEnabled(False)
-            self.peopleObjectRadioButton.setEnabled(False)
-            self.dronesObjectRadioButton.setEnabled(False)
-            self.meanTargetRadioButton.setEnabled(False)
-            self.firstTargetRadioButton.setEnabled(False)
-            self.mostRecognizableTargetRadioButton.setEnabled(False)
+            self.targetAllRadioButton.setEnabled(False)
+            self.targetPeopleRadioButton.setEnabled(False)
+            self.targetDronesRadioButton.setEnabled(False)
+            self.meanTargetAlgorithmRadioButton.setEnabled(False)
+            self.firstTargetAlgorithmRadioButton.setEnabled(False)
+            self.mostRecognizableTargetAlgorithmRadioButton.setEnabled(False)
             self.powerToggleButton.setStyleSheet("background-color: #36d13c; color: white;")
 
     def update_frame(self, q_image):
