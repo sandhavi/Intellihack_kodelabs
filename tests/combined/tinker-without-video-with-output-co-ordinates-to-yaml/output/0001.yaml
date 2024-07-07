@@ -1,10 +1,12 @@
 - mean_coordinates:
     x: 319
     y: 336
+  id: 12
   timestamp: '2024-07-01T02:32:25.945908'
 - mean_coordinates:
     x: null
     y: null
+  id: 12
   timestamp: '2024-07-01T02:32:26.873212'
 - mean_coordinates:
     x: null
@@ -13,8 +15,17 @@
 - mean_coordinates:
     x: 312
     y: 326
+  id: 12
   timestamp: '2024-07-01T02:32:28.828198'
+- mean_coordinates:
+    x: 456.4
+    y: 456.4
+  id: 12
+  timestamp: '2024-07-01T02:32:29.748402'
+
 - mean_coordinates:
     x: null
     y: null
+  id: null
   timestamp: '2024-07-01T02:32:29.748402'
+
