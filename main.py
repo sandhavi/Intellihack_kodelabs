@@ -3,11 +3,11 @@ import sys
 import cv2
 import time
 import numpy as np
+import serial
+import utills
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtCore import QUrl
-
-import utills
 from model import load_model, run_inference_for_single_image, prepare_detections, initialize_tracker
 from object_detection.utils import label_map_util
 from pyqt5_ui.main_window import Ui_MainWindow
@@ -15,6 +15,7 @@ from pyqt5_ui.video_widget import Ui_VideoWidget
 from pyqt5_ui.chat_widget import Ui_ChatWidget
 from utills import resource_path
 import config
+import arduino_serial_com
 
 
 class DetectionThread(QtCore.QThread):
@@ -34,6 +35,8 @@ class DetectionThread(QtCore.QThread):
         self.category_index = label_map_util.create_category_index_from_labelmap(resource_path(config.LabelMap), use_display_name=True)
         self.valid_classes = config.ValidClasses
         self.tracker = initialize_tracker(embedder=config.DeepsortTracker)
+        self.send_signal = False  # Flag to control sending data to Arduino
+        self.ser = None  # Arduino serial connection
 
     def run(self):
         while self._running:
@@ -84,6 +87,8 @@ class DetectionThread(QtCore.QThread):
                     x_center = int((ltrb[0] + ltrb[2]) / 2)
                     y_center = int((ltrb[1] + ltrb[3]) / 2)
                     cv2.putText(frame, f'F-ID: {track_id}', ((x_center + 10), (y_center - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+                if self.send_signal:
+                    arduino_serial_com.send_data(self.ser, mean_center_x, mean_center_y)
                 self.update_data_signal.emit(", ".join(class_names), mean_center_x, mean_center_y)
 
             if config.TargetAlgorithm == "F":
@@ -108,6 +113,8 @@ class DetectionThread(QtCore.QThread):
                         y_center = int((ltrb[1] + ltrb[3]) / 2)
                         cv2.drawMarker(frame, (x_center, y_center), (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
                         cv2.putText(frame, f'F-ID: {track_id}', ((x_center + 10), (y_center - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                        if self.send_signal:
+                            arduino_serial_com.send_data(self.ser, x_center, y_center)
                         self.update_data_signal.emit(", ".join(class_names), x_center, y_center)
                         first_track_lost = False
                         break
@@ -127,7 +134,9 @@ class DetectionThread(QtCore.QThread):
                     max_center = centers[max_score_index]
                     cv2.drawMarker(frame, max_center, (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
                     cv2.putText(frame, f'MR', ((max_center[0] + 10), (max_center[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-                    self.update_data_signal.emit(", ".join(class_names), max_center[0], max_center[1]) # convert class_names array to string like:- class_name_1, class_name_2
+                    if self.send_signal:
+                        arduino_serial_com.send_data(self.ser, max_center[0], max_center[1])
+                    self.update_data_signal.emit(", ".join(class_names), max_center[0], max_center[1])
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             height, width, channel = frame.shape
@@ -140,6 +149,7 @@ class DetectionThread(QtCore.QThread):
         self._running = False
         self.resume()  # Ensure thread is not paused when stopping
         self.cap.release()
+        self.set_send_signal(False)  # Ensure the serial connection is closed
 
     def pause(self):
         self.mutex.lock()
@@ -160,6 +170,15 @@ class DetectionThread(QtCore.QThread):
         self.cap.release()
         self.cap = cv2.VideoCapture(self.camera_index)
 
+    def set_send_signal(self, state):
+        self.send_signal = state
+        if self.send_signal and self.ser is not None:
+            self.ser = serial.Serial(config.ComPort, config.BaudRate, timeout=1)
+            time.sleep(2)  # Give some time for the connection to establish
+        else:
+            if hasattr(self, 'ser') and self.ser is not None:
+                self.ser.close()
+                del self.ser
 
 class VideoWidget(QtWidgets.QWidget, Ui_VideoWidget):
     def __init__(self):
@@ -208,6 +227,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Main window button slots
         self.powerToggleButton.clicked.connect(self.toggle_detection_thread)
+        self.signalToggleButton.clicked.connect(self.toggle_signal_output)
         self.refreshCameraListButton.clicked.connect(self.refresh_camera_list)
         self.cameraComboBox.currentIndexChanged.connect(self.change_camera)
 
@@ -294,17 +314,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.meanTargetAlgorithmRadioButton.setEnabled(False)
             self.firstTargetAlgorithmRadioButton.setEnabled(False)
             self.mostRecognizableTargetAlgorithmRadioButton.setEnabled(False)
-
             self.detection_thread.stop()
             self.detection_thread.wait()
             self.videoWidget.hide()
             self.toggle_power_button(True)
+            self.detection_thread.set_send_signal(False)
 
     def pause_detection_thread(self):
         if self.detection_thread:
             self.detection_thread.pause()
             self.videoWidget.hide()
             self.toggle_power_button(True)
+            self.detection_thread.set_send_signal(False)
 
     def resume_detection_thread(self):
         if self.detection_thread:
@@ -316,6 +337,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.pause_detection_thread()
         else:
             self.resume_detection_thread()
+
+    def toggle_signal_output(self):
+        if self.detection_thread.send_signal:
+            self.detection_thread.set_send_signal(False)
+            self.signalToggleButton.setStyleSheet("background-color: none; color: black;")
+        else:
+            self.detection_thread.set_send_signal(True)
+            self.signalToggleButton.setStyleSheet("background-color: #36d13c; color: white;")
 
     def toggle_power_button(self, activated):
         if activated:
