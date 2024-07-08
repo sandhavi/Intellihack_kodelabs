@@ -3,11 +3,16 @@ ___*AI Security CaMera System*_ - _*KodeLabs product.*___
 
 Civilian and Military surveillance and protection system.
 
-<img src=".github/images/screenshot.png">
-<img src=".github/images/targeting-robot-1.jpg">
-<img src=".github/images/targeting-robot-3.jpg">
-<img src=".github/images/targeting-robot-5.jpg">
-<img src=".github/images/targeting-robot-6.jpg">
+### Images Gallery
+
+<div style="display: flex; flex-wrap: wrap; gap: 10px;">
+  <img src=".github/images/screenshot-2.png" alt="Screenshot 2" style="width: 200px; height: auto;">
+  <img src=".github/images/screenshot-1.png" alt="Screenshot 1" style="width: 200px; height: auto;">
+  <img src=".github/images/targeting-robot-1.jpg" alt="Targeting Robot 1" style="width: 200px; height: auto;">
+  <img src=".github/images/targeting-robot-3.jpg" alt="Targeting Robot 3" style="width: 200px; height: auto;">
+  <img src=".github/images/targeting-robot-5.jpg" alt="Targeting Robot 5" style="width: 200px; height: auto;">
+  <img src=".github/images/targeting-robot-6.jpg" alt="Targeting Robot 6" style="width: 200px; height: auto;">
+</div>
 
 ## Installation
 
@@ -16,6 +21,10 @@ Highly advised to set up a separate `anaconda` environment to run, develop or te
 1. Install Anaconda
 2. Open using the anaconda environment you created and install all the required files listed in `/requirements.txt` (use only the one in project root).
 3. Run the `main.py`
+
+### Working output
+
+
 
 ## Development
 
