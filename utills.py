@@ -4,6 +4,7 @@ import math
 import serial
 import serial.tools.list_ports
 
+
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
@@ -45,8 +46,8 @@ def calculate_angle(axis, center_pos, image_size, real_width, real_distance):
     # Compute the arctangent (inverse tangent) of the value
     theta = -1 * math.atan(value) * 180 / math.pi
     if axis == "horizontal":
-        return -1 * theta
-    elif axis == "vertical":
         return theta
+    elif axis == "vertical":
+        return -1 * theta
     else:
         return 0

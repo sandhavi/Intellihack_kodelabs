@@ -222,10 +222,13 @@ class DetectionThread(QtCore.QThread):
     def set_send_signal(self, state):
         self.send_signal = state
 
+
 class VideoWidget(QtWidgets.QWidget, Ui_VideoWidget):
     def __init__(self):
         super(VideoWidget, self).__init__()
         self.setupUi(self)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(resource_path("data/images/icons/favicon.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -237,12 +240,31 @@ class ChatWidget(QtWidgets.QWidget, Ui_ChatWidget):
     def __init__(self):
         super(ChatWidget, self).__init__()
         self.setupUi(self)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(resource_path("data/images/icons/favicon.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 
+        message_icon = QtGui.QIcon()
+        message_icon.addPixmap(QtGui.QPixmap(resource_path("data/images/icons/send.svg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.messageButton.setIcon(message_icon)
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(resource_path("data/images/icons/favicon.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+
+        power_icon = QtGui.QIcon()
+        power_icon.addPixmap(QtGui.QPixmap(resource_path("data/images/icons/power.svg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.powerToggleButton.setIcon(power_icon)
+
+        signal_icon = QtGui.QIcon()
+        signal_icon.addPixmap(QtGui.QPixmap(resource_path("data/images/icons/signal.svg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.signalToggleButton.setIcon(signal_icon)
+
+        refresh_icon = QtGui.QIcon()
+        refresh_icon.addPixmap(QtGui.QPixmap(resource_path("data/images/icons/refresh.svg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.refreshCameraListButton.setIcon(refresh_icon)
 
         # Initialize the VideoWidget
         self.videoWidget = VideoWidget()
