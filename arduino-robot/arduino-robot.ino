@@ -16,9 +16,9 @@ float speed = 0.5; // Default speed (0.0 to 1.0)
 void setup() {
   Serial.begin(9600);
   horizontalServo.attach(horizontalServoPin);
-  // verticalServo.attach(verticalServoPin);
+  verticalServo.attach(verticalServoPin);
   horizontalServo.write(defaultHorizontalAngle); // Move to default position
-  // verticalServo.write(defaultVerticalAngle);     // Move to default position
+  verticalServo.write(defaultVerticalAngle);     // Move to default position
 }
 
 void loop() {
@@ -38,8 +38,10 @@ void loop() {
 
     // Update the servo positions
     horizontalServo.write(currentHorizontalAngle);
-    // verticalServo.write(currentVerticalAngle);
+    verticalServo.write(currentVerticalAngle);
   }
+
+  delay(10)
 }
 
 void parseInput(String input) {

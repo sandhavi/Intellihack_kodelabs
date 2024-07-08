@@ -2,6 +2,7 @@ import os
 import sys
 import math
 import serial
+import serial.tools.list_ports
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -17,15 +18,15 @@ def set_text(value):
         return str(value)
 
 
-def check_serial_port(port):
-    try:
-        with serial.Serial(port, timeout=1) as ser:
-            return ser.is_open
-    except serial.SerialException:
+def check_port(port):
+    ports = [port.device for port in serial.tools.list_ports.comports()]
+    if port in ports:
+        return True
+    else:
         return False
 
 
-def calculate_angle(x, tx, w, r):
+def calculate_angle(x, xc, xt, w, r):
     """
     x:  Center of the object (bounding box) in pixels (or relative distance.)
     tx: Least visible width of the image in pixels (or relative width.)
@@ -33,7 +34,7 @@ def calculate_angle(x, tx, w, r):
     r:  Real distance from center of rotation to the least visible image width position.
     """
     # Calculate the value inside the arctan function
-    value = (x * w) / (tx * r)
+    value = ((x - xc) * w) / (xt * r)
     # Compute the arctangent (inverse tangent) of the value
-    theta = math.atan(value)
+    theta = -1 * math.atan(value) * 180 / math.pi
     return theta
