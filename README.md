@@ -3,6 +3,8 @@ ___*AI Security CaMera System*_ - _*KodeLabs product.*___
 
 Civilian and Military surveillance and protection system.
 
+<>
+
 ## Installation
 
 Highly advised to set up a separate `anaconda` environment to run, develop or test the application. If you only need to use the prebuild app. use one of the binary files in `/bin` folder. (Select the appropriate one for your os.)
@@ -34,6 +36,15 @@ pyuic5 -o pyqt5_ui/video_widget.py pyqt5_ui/video_widget.ui
 pyuic5 -o pyqt5_ui/chat_widget.py pyqt5_ui/chat_widget.ui
 ```
 
-## Update app settings
+### Update app settings
 
 Update variable values in the `config.py`.
+
+### Calculation of angle of rotation in `xyz` plane
+
+Refer the [ASAM-robot-logic.pdf](/arduino-robot/ASAM-robot-logic.pdf) to understand the underling mathematical calculation.
+
+### Arduino Code
+
+Refer the [Arduino Code](/arduino-robot/arduino-robot.ino) to refer teh arduino program.
+
