@@ -36,5 +36,5 @@ def calculate_angle(x, xt, w, r):
     # Calculate the value inside the arctan function
     value = ((x - xt/2) * w) / (xt * r)
     # Compute the arctangent (inverse tangent) of the value
-    theta = 1 * math.atan(value) * 180 / math.pi
+    theta = -1 * math.atan(value) * 180 / math.pi
     return theta
