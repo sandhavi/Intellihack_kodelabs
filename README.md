@@ -6,8 +6,8 @@ Civilian and Military surveillance and protection system.
 ### Images Gallery
 
 <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-  <img src=".github/images/screenshot-2.png" alt="Screenshot 2" style="width: 200px; height: auto;">
-  <img src=".github/images/screenshot-1.png" alt="Screenshot 1" style="width: 200px; height: auto;">
+  <img src=".github/images/screenshot-2.jpg" alt="Screenshot 2" style="width: 200px; height: auto;">
+  <img src=".github/images/screenshot-1.jpg" alt="Screenshot 1" style="width: 200px; height: auto;">
   <img src=".github/images/targeting-robot-1.jpg" alt="Targeting Robot 1" style="width: 200px; height: auto;">
   <img src=".github/images/targeting-robot-3.jpg" alt="Targeting Robot 3" style="width: 200px; height: auto;">
   <img src=".github/images/targeting-robot-5.jpg" alt="Targeting Robot 5" style="width: 200px; height: auto;">
