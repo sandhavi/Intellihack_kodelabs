@@ -30,7 +30,7 @@ ImageTotalHeightPixels = 480
 
 # in mm
 ImageRealWidth = 2
-ImageRealHeight = 0
+ImageRealHeight = 3/2
 
 # In mm
 RealRadius = 47
