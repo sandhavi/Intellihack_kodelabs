@@ -36,14 +36,13 @@ class SerialThread(QtCore.QThread):
             if self._paused:
                 self.pause_condition.wait(self.mutex)
             self.mutex.unlock()
-            # Implement sending data logic here
 
     def send_data(self, data):
         """Send data to the Arduino."""
         if self.ser and self.ser.is_open:
             try:
-                print(data)
                 self.ser.write(data.encode())
+                print(data)
             except serial.SerialException as e:
                 print(f"Error sending data: {e}")
 
