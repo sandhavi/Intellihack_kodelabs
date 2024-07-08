@@ -3,6 +3,8 @@ ___*AI Security CaMera System*_ - _*KodeLabs product.*___
 
 Civilian and Military surveillance and protection system.
 
+[Download the recent release.](https://github.com/sandhavi/Intellihack_kodelabs/releases/download/V1.0.0/asam_system_bin_32x64.zip)
+
 ### Images Gallery
 
 <div style="display: flex; flex-wrap: wrap; gap: 10px;">
