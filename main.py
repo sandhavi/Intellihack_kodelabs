@@ -42,6 +42,7 @@ class SerialThread(QtCore.QThread):
         """Send data to the Arduino."""
         if self.ser and self.ser.is_open:
             try:
+                print(data)
                 self.ser.write(data.encode())
             except serial.SerialException as e:
                 print(f"Error sending data: {e}")
@@ -86,7 +87,7 @@ class DetectionThread(QtCore.QThread):
 
     def run(self):
         # Check COM port connected.
-        if utills.check_serial_port(config.ComPort):
+        if utills.check_port(config.ComPort):
             self.serial_thread.start()
         while self._running:
             self.mutex.lock()
@@ -137,7 +138,7 @@ class DetectionThread(QtCore.QThread):
                     y_center = int((ltrb[1] + ltrb[3]) / 2)
                     cv2.putText(frame, f'F-ID: {track_id}', ((x_center + 10), (y_center - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
                 if self.send_signal:
-                    self.serial_thread.send_data(f"{utills.calculate_angle(mean_center_x, config.ImageTotalWidthPixels, config.ImageRealWidth, config.RealRadius)},{utills.calculate_angle(mean_center_y, config.ImageTotalHeightPixels, config.ImageRealHeight, config.RealRadius)}\n")
+                    self.serial_thread.send_data(f"{utills.calculate_angle(mean_center_x, config.ImageRealWidth / 2, config.ImageTotalWidthPixels, config.ImageRealWidth, config.RealRadius)},{utills.calculate_angle(mean_center_y, config.ImageRealHeight / 2, config.ImageTotalHeightPixels, config.ImageRealHeight, config.RealRadius)}\n")
                 self.update_data_signal.emit(", ".join(class_names), mean_center_x, mean_center_y)
 
             if config.TargetAlgorithm == "F":
@@ -163,7 +164,7 @@ class DetectionThread(QtCore.QThread):
                         cv2.drawMarker(frame, (x_center, y_center), (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
                         cv2.putText(frame, f'F-ID: {track_id}', ((x_center + 10), (y_center - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
                         if self.send_signal:
-                            self.serial_thread.send_data(f"{utills.calculate_angle(x_center, config.ImageTotalWidthPixels, config.ImageRealWidth, config.RealRadius)},{utills.calculate_angle(y_center, config.ImageTotalHeightPixels, config.ImageRealHeight, config.RealRadius)}\n")
+                            self.serial_thread.send_data(f"{utills.calculate_angle(x_center, config.ImageRealWidth / 2, config.ImageTotalWidthPixels, config.ImageRealWidth, config.RealRadius)},{utills.calculate_angle(y_center, config.ImageRealHeight / 2, config.ImageTotalHeightPixels, config.ImageRealHeight, config.RealRadius)}\n")
                         self.update_data_signal.emit(", ".join(class_names), x_center, y_center)
                         first_track_lost = False
                         break
@@ -184,7 +185,7 @@ class DetectionThread(QtCore.QThread):
                     cv2.drawMarker(frame, max_center, (0, 255, 0), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=1, line_type=cv2.LINE_AA)
                     cv2.putText(frame, f'MR', ((max_center[0] + 10), (max_center[1] - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
                     if self.send_signal:
-                        self.serial_thread.send_data(f"{utills.calculate_angle(max_center[0], config.ImageTotalWidthPixels, config.ImageRealWidth, config.RealRadius)},{utills.calculate_angle(max_center[1], config.ImageTotalHeightPixels, config.ImageRealHeight, config.RealRadius)}\n")
+                        self.serial_thread.send_data(f"{utills.calculate_angle(max_center[0], config.ImageRealWidth / 2, config.ImageTotalWidthPixels, config.ImageRealWidth, config.RealRadius)},{utills.calculate_angle(max_center[1], config.ImageRealHeight / 2, config.ImageTotalHeightPixels, config.ImageRealHeight, config.RealRadius)}\n")
                     self.update_data_signal.emit(", ".join(class_names), max_center[0], max_center[1])
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -274,7 +275,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.cameraComboBox.currentIndexChanged.connect(self.change_camera)
 
         # Check COM port connected. If its not connected disable signalToggleButton button.
-        if not utills.check_serial_port(config.ComPort):
+        if not utills.check_port(config.ComPort):
             self.signalToggleButton.setEnabled(False)
 
         # Initial camera list setup
