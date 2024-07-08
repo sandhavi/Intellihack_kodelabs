@@ -3,7 +3,11 @@ ___*AI Security CaMera System*_ - _*KodeLabs product.*___
 
 Civilian and Military surveillance and protection system.
 
-<>
+<img src=".github/images/screenshot.png">
+<img src=".github/images/targeting-robot-1.jpg">
+<img src=".github/images/targeting-robot-3.jpg">
+<img src=".github/images/targeting-robot-5.jpg">
+<img src=".github/images/targeting-robot-6.jpg">
 
 ## Installation
 
