@@ -254,6 +254,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(resource_path("data/images/icons/favicon.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(QtGui.QIcon(resource_path("data/images/icons/favicon.png")))
 
         power_icon = QtGui.QIcon()
         power_icon.addPixmap(QtGui.QPixmap(resource_path("data/images/icons/power.svg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)

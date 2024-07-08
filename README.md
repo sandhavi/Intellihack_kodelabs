@@ -16,13 +16,12 @@ Civilian and Military surveillance and protection system.
 
 ## Installation
 
-Highly advised to set up a separate `anaconda` environment to run, develop or test the application. If you only need to use the prebuild app. use one of the binary files in `/bin` folder. (Select the appropriate one for your os.)
+Highly advised to set up a separate `anaconda` environment to run, develop or test the application. If you only need to use the prebuild app. use one of the binary files in [releases section](https://github.com/sandhavi/Intellihack_kodelabs/releases) and download the most recent stable release. (Select the appropriate one for your os.)
 
-[![Watch the video before installation](.github/images/video-placeholder-installation.png)](https://youtu.be/J3gjK-BNoGM)
-
-1. Install Anaconda
-2. Open using the anaconda environment you created and install all the required files listed in `/requirements.txt` (use only the one in project root).
-3. Run the `main.py`
+1. Install Anaconda.
+2. Clone the project.
+3. Open using the anaconda environment you created and install all the required files listed in `/requirements.txt` (use only the one in project root).
+4. Run the `main.py`
 
 ### Working output
 
@@ -33,6 +32,8 @@ Highly advised to set up a separate `anaconda` environment to run, develop or te
 Highly recommended to use pycharm and anaconda.
 
 ### Build the exe 
+
+(If you wish to simply run without any building process use the  binary files in [releases section](https://github.com/sandhavi/Intellihack_kodelabs/releases) and download the most recent stable release.)
 
 Run the below command
 
