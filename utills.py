@@ -26,15 +26,15 @@ def check_port(port):
         return False
 
 
-def calculate_angle(x, xc, xt, w, r):
+def calculate_angle(x, xt, w, r):
     """
-    x:  Center of the object (bounding box) in pixels (or relative distance.)
-    tx: Least visible width of the image in pixels (or relative width.)
+    x:  Center of the object (bounding box) in pixels (or relative distance).
+    xt: Least visible width of the image in pixels (or relative width).
     w:  Real Width of the image in mm/cm/m/km.
     r:  Real distance from center of rotation to the least visible image width position.
     """
     # Calculate the value inside the arctan function
-    value = ((x - xc) * w) / (xt * r)
+    value = ((x - xt/2) * w) / (xt * r)
     # Compute the arctangent (inverse tangent) of the value
-    theta = -1 * math.atan(value) * 180 / math.pi
+    theta = 1 * math.atan(value) * 180 / math.pi
     return theta

@@ -33,4 +33,4 @@ ImageRealWidth = 2
 ImageRealHeight = 3/2
 
 # In mm
-RealRadius = 47
+RealRadius = 4.7

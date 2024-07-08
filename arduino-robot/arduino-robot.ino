@@ -30,6 +30,7 @@ void loop() {
     Serial.print("currentHorizontalAngle: ");
     Serial.println(currentHorizontalAngle);
 
+
     Serial.print("currentVerticalAngle: ");
     Serial.println(currentVerticalAngle);
 
@@ -40,8 +41,6 @@ void loop() {
     horizontalServo.write(currentHorizontalAngle);
     verticalServo.write(currentVerticalAngle);
   }
-
-  delay(10);
 }
 
 void parseInput(String input) {
