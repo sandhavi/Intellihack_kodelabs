@@ -2,8 +2,8 @@
 
 Servo horizontalServo, verticalServo;
 
-const int horizontalServoPin = 2;  // PWM pin for horizontally rotating servo
-const int verticalServoPin = 3;    // PWM pin for vertically rotating servo
+const int horizontalServoPin = 9;  // PWM pin for horizontally rotating servo
+const int verticalServoPin = 10;    // PWM pin for vertically rotating servo
 
 int defaultHorizontalAngle = 90;   // Default horizontal angle
 int defaultVerticalAngle = 90;     // Default vertical angle
@@ -41,7 +41,7 @@ void loop() {
     verticalServo.write(currentVerticalAngle);
   }
 
-  delay(10)
+  delay(10);
 }
 
 void parseInput(String input) {
