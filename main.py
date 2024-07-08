@@ -247,6 +247,7 @@ class ChatWidget(QtWidgets.QWidget, Ui_ChatWidget):
         message_icon.addPixmap(QtGui.QPixmap(resource_path("data/images/icons/send.svg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.messageButton.setIcon(message_icon)
 
+
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
